@@ -2,6 +2,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def analyze_poutre(data):
+    n_travees = int(data['n_travees'])
+    longueurs = [float(data[f'longueur_{i+1}']) for i in range(n_travees)]
+    charges = [float(data[f'charge_{i+1}']) for i in range(n_travees)]
+    b = float(data['b'])
+    h = float(data['h'])
+    d = float(data['d'])
+    fc28 = float(data['fc28'])
+    fe = float(data['fe'])
+
+    A, B = calcul_matrices(n_travees, longueurs, charges)
+    moments_appuis = resolution_systeme(A, B)
+    moments = calcul_moments(n_travees, longueurs, charges, moments_appuis)
+    efforts_tranchants = calcul_efforts_tranchants(n_travees, longueurs, charges, moments_appuis)
+    armatures = calcul_armatures_bael(moments, efforts_tranchants, b, h, d, fc28, fe)
+
+    affichage_resultats(moments, efforts_tranchants, longueurs, armatures, b, h)
+
+    message = "Analyse terminée. Voir l'image pour les résultats."
+    return {'message': message}
+
 def saisie_donnees():
     n_travees = int(input("Entrez le nombre de travées : "))
     longueurs = []
