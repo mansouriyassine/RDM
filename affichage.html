@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse de Poutre Continue BAEL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analyse de Poutre Continue BAEL</h1>
+        <form id="poutre-form">
+            <label for="n_travees">Nombre de travées :</label>
+            <input type="number" id="n_travees" name="n_travees" required min="1">
+            
+            <div id="travees-inputs"></div>
+            
+            <label for="b">Largeur de la poutre (m) :</label>
+            <input type="number" id="b" name="b" step="0.01" required>
+            
+            <label for="h">Hauteur de la poutre (m) :</label>
+            <input type="number" id="h" name="h" step="0.01" required>
+            
+            <label for="d">Hauteur utile de la poutre (m) :</label>
+            <input type="number" id="d" name="d" step="0.01" required>
+            
+            <label for="fc28">Résistance caractéristique du béton à 28 jours (MPa) :</label>
+            <input type="number" id="fc28" name="fc28" step="0.1" required>
+            
+            <label for="fe">Limite d'élasticité de l'acier (MPa) :</label>
+            <input type="number" id="fe" name="fe" step="1" required>
+            
+            <button type="submit">Calculer</button>
+        </form>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        document.getElementById('n_travees').addEventListener('change', function() {
+            const n = parseInt(this.value);
+            const container = document.getElementById('travees-inputs');
+            container.innerHTML = '';
+            for (let i = 1; i <= n; i++) {
+                container.innerHTML += `
+                    <label for="longueur_${i}">Longueur de la travée ${i} (m) :</label>
+                    <input type="number" id="longueur_${i}" name="longueur_${i}" step="0.01" required>
+                    <label for="charge_${i}">Charge sur la travée ${i} (kN/m) :</label>
+                    <input type="number" id="charge_${i}" name="charge_${i}" step="0.01" required>
+                `;
+            }
+        });
+
+        document.getElementById('poutre-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/calculate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = `
+                    <h2>Résultats</h2>
+                    <p>${data.message}</p>
+                    <img src="${data.image_url}" alt="Résultats de l'analyse de la poutre">
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = '<p>Une erreur est survenue lors du calcul.</p>';
+            });
+        });
+    </script>
+</body>
+</html>
