@@ -55,7 +55,7 @@ def calcul_efforts_tranchants(n_travees, longueurs, charges, moments_appuis):
 
 def affichage_resultats(moments, efforts_tranchants, longueurs):
     plt.figure(figsize=(12, 10))
-    
+
     # Diagramme des moments de flexion
     plt.subplot(2, 1, 1)
     offset = 0
@@ -67,7 +67,7 @@ def affichage_resultats(moments, efforts_tranchants, longueurs):
     plt.ylabel('Moment de flexion (kN.m)')
     plt.legend()
     plt.grid(True)
-    
+
     # Diagramme des efforts tranchants
     plt.subplot(2, 1, 2)
     offset = 0
@@ -79,22 +79,35 @@ def affichage_resultats(moments, efforts_tranchants, longueurs):
     plt.ylabel('Effort tranchant (kN)')
     plt.legend()
     plt.grid(True)
-    
+
     plt.tight_layout()
+    plt.savefig('diagrammes.png')
+    print("Graphique sauvegardé dans 'diagrammes.png'")
     plt.show()
 
 def main():
+    print("Début de l'exécution")
     n_travees, longueurs, charges = saisie_donnees()
+    print("Données saisies")
     A, B = calcul_matrices(n_travees, longueurs, charges)
+    print("Matrices calculées")
     moments_appuis = resolution_systeme(A, B)
+    print("Système résolu")
     moments = calcul_moments(n_travees, longueurs, charges, moments_appuis)
+    print("Moments calculés")
     efforts_tranchants = calcul_efforts_tranchants(n_travees, longueurs, charges, moments_appuis)
-    
+    print("Efforts tranchants calculés")
+
     print("\nMoments aux appuis :")
     for i, moment in enumerate(moments_appuis):
         print(f"Appui {i+1}: {moment:.2f} kN.m")
-    
-    affichage_resultats(moments, efforts_tranchants, longueurs)
+
+    print("Tentative d'affichage des résultats")
+    try:
+        affichage_resultats(moments, efforts_tranchants, longueurs)
+        print("Affichage réussi")
+    except Exception as e:
+        print(f"Erreur lors de l'affichage : {e}")
 
 if __name__ == "__main__":
     main()
