@@ -54,9 +54,9 @@ def calcul_poutre_continue(longueur_totale, longueurs_travees, charges):
     return moments, reactions
 
 # Exemple d'utilisation
-longueur_totale = 20  # mètres
-longueurs_travees = [5, 5, 5, 5]  # mètres
-charges = [10, 15, 10, 20]  # kN/m
+longueur_totale = 16  # mètres
+longueurs_travees = [2, 5, 3, 6]  # mètres
+charges = [1, 2, 1, 3]  # kN/m
 
 moments, reactions = calcul_poutre_continue(longueur_totale, longueurs_travees, charges)
 
