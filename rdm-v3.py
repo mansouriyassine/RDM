@@ -1,81 +1,48 @@
 #!/usr/bin/env python3
 import numpy as np
 
-def get_input_data():
-    num_travees = int(input("Entrez le nombre de travées : "))
-    longueurs = []
-    charges = []
-    for i in range(1, num_travees + 1):
-        longueur = float(input(f"Entrez la longueur de la travée {i} (en m) : "))
-        charge = float(input(f"Entrez la charge uniformément répartie sur la travée {i} (en kN/m) : "))
-        longueurs.append(longueur)
-        charges.append(charge)
-    return num_travees, longueurs, charges
-
-def calculer_moments(num_travees, longueurs, charges):
-    EI = 1  # On suppose que EI est constant et égal à 1 pour simplifier les calculs
+def calculate_moments(spans, loads):
+    n = len(spans)
     
-    MT0 = []
-    theta0_star = []
-    theta0_double_star = []
+    # Calcul des coefficients de la méthode de Clapeyron
+    a = [0] + [spans[i-1] / 6 for i in range(1, n)] + [0]
+    b = [spans[i] / 3 for i in range(n)]
+    c = [0] + [spans[i] / 6 for i in range(n-1)] + [0]
     
-    for i in range(num_travees):
-        Li = longueurs[i]
-        qi = charges[i]
-        
-        # Moment de travée dû aux charges uniformément réparties
-        MT0.append(qi * Li**2 / 8)
-        
-        # Calcul des rotations
-        if i == 0:
-            theta0_star.append(-MT0[-1] / (EI * Li))
-            theta0_double_star.append(MT0[-1] / (EI * Li))
-        else:
-            Li_prev = longueurs[i - 1]
-            MT0_prev = MT0[-2]
-            
-            theta0_star.append(-MT0[-1] / (EI * Li))
-            theta0_double_star.append(MT0[-1] / (EI * Li))
+    # Calcul des charges équivalentes
+    q = [-loads[i] * spans[i]**2 / 12 for i in range(n)]
     
-    # Construction du système d'équations
-    A = [[0 for _ in range(num_travees + 1)] for _ in range(num_travees + 1)]
-    B = [0] * (num_travees + 1)
+    # Construction de la matrice tridiagonale
+    A = np.zeros((n+1, n+1))
+    for i in range(1, n):
+        A[i, i-1] = a[i]
+        A[i, i] = b[i-1] + b[i]
+        A[i, i+1] = c[i]
     
-    for i in range(1, num_travees):
-        Li = longueurs[i - 1]
-        Li1 = longueurs[i]
-        
-        A[i][i - 1] = Li
-        A[i][i] = 2 * (Li + Li1)
-        A[i][i + 1] = Li1
-        
-        B[i] = 6 * (theta0_double_star[i] - theta0_star[i])
-    
-    # Appliquer les conditions aux limites pour rendre la matrice inversible
-    A[0][0] = 1
-    A[-1][-1] = 1
+    # Conditions aux limites (appuis simples aux extrémités)
+    A[0, 0] = A[n, n] = 1
     
     # Résolution du système d'équations
-    A = np.array(A)
-    B = np.array(B)
-    moments = np.linalg.solve(A, B)
+    moments = np.linalg.solve(A, q)
     
-    return moments, MT0, theta0_star, theta0_double_star
+    return moments
 
 def main():
-    num_travees, longueurs, charges = get_input_data()
-    moments, MT0, theta0_star, theta0_double_star = calculer_moments(num_travees, longueurs, charges)
+    n = int(input("Entrez le nombre de travées : "))
+    spans = []
+    loads = []
     
-    print("Moments aux appuis (kN.m):")
+    for i in range(n):
+        span = float(input(f"Entrez la longueur de la travée {i+1} (en m) : "))
+        load = float(input(f"Entrez la charge uniformément répartie sur la travée {i+1} (en kN/m) : "))
+        spans.append(span)
+        loads.append(load)
+    
+    moments = calculate_moments(spans, loads)
+    
+    print("\nMoments aux appuis (en kN·m) :")
     for i, moment in enumerate(moments):
-        print(f"Appui {i}: {moment:.2f} kN.m")
-    
-    print("\nDétails des calculs intermédiaires :")
-    for i in range(num_travees):
-        print(f"Travée {i+1} : L = {longueurs[i]:.2f} m, q = {charges[i]:.2f} kN/m")
-        print(f"  MT0 = {MT0[i]:.2f} kN.m")
-        print(f"  θ0* = {theta0_star[i]:.2f}")
-        print(f"  θ0** = {theta0_double_star[i]:.2f}")
+        print(f"Appui {i}: {moment:.2f}")
 
 if __name__ == "__main__":
     main()
