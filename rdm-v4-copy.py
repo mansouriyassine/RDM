@@ -14,43 +14,37 @@ def calculate_beam_properties(n, L, q):
     results = []
     abs_cumul = 0
     
-    # Calculer d'abord tous les THETA0* sans DeltaTheta
-    for i in range(n + 1):
-        if i == 0:
-            results.append({
-                'x': 'x0',
-                'Abs': abs_cumul,
-                'L': '-',
-                'q': '-',
-                'MT0': '-',
-                'THETA0*': '-',
-                'THETA0**': '-',
-                'DeltaTheta': '-'
-            })
-        else:
-            MT0 = q[i-1] * L[i-1]**2 / 8
-            theta_0_star = -q[i-1] * L[i-1]**3 / 24
-            theta_0_star_star = -theta_0_star
-            abs_cumul += L[i-1]
-            
-            results.append({
-                'x': f'x{i}',
-                'Abs': abs_cumul,
-                'L': L[i-1],
-                'q': q[i-1],
-                'MT0': MT0,
-                'THETA0*': theta_0_star,
-                'THETA0**': theta_0_star_star,
-                'DeltaTheta': '-'  # Sera calculé dans la prochaine étape
-            })
+    results.append({
+        'x': 'x0',
+        'Abs': abs_cumul,
+        'L': 0,
+        'q': 0,
+        'MT0': 0,
+        'THETA0*': 0,
+        'THETA0**': 0,
+        'DeltaTheta': 0
+    })
+    
+    for i in range(n):
+        MT0 = q[i] * L[i]**2 / 8
+        theta_0_star = -q[i] * L[i]**3 / 24
+        theta_0_star_star = -theta_0_star
+        abs_cumul += L[i]
+        
+        results.append({
+            'x': f'x{i+1}',
+            'Abs': abs_cumul,
+            'L': L[i],
+            'q': q[i],
+            'MT0': MT0,
+            'THETA0*': theta_0_star,
+            'THETA0**': theta_0_star_star,
+            'DeltaTheta': 0  # Sera calculé dans la prochaine étape
+        })
     
     # Calculer DeltaTheta
-    for i in range(len(results) - 1):
-        if i == 0:
-            results[i]['DeltaTheta'] = '-'
-        else:
-            delta_theta = 6 * (results[i+1]['THETA0*'] - results[i]['THETA0**'])
-            results[i]['DeltaTheta'] = delta_theta
+    for i in range(1, len(results)):
+        results[i]['DeltaTheta'] = 6 * (results[i]['THETA0*'] - results[i-1]['THETA0**'])
     
     return results
 
@@ -73,10 +67,11 @@ def calculate_support_moments(results):
     moments = np.linalg.solve(A, b)
     
     # Ajouter les moments aux résultats
-    for i in range(1, len(results)-1):
-        results[i]['M'] = moments[i-1]
-    results[0]['M'] = 0  # Moment nul au premier appui
-    results[-1]['M'] = 0  # Moment nul au dernier appui
+    for i in range(len(results)):
+        if i == 0 or i == len(results) - 1:
+            results[i]['M'] = 0  # Moment nul aux appuis d'extrémité
+        else:
+            results[i]['M'] = moments[i-1]
     
     return results
 
@@ -85,7 +80,7 @@ def print_results(results):
     print("        m     kN/m   kN.m   kN.m x EI  kN.m x EI  kN.m x EI   kN.m")
     for r in results:
         if r['x'] == 'x0':
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['THETA0**']:<9} {r['DeltaTheta']:<11} {r['M']:.2f}")
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {'-':<7} {'-':<7} {'-':<7} {'-':<9} {'-':<9} {'-':<11} {r['M']:.2f}")
         else:
             print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {r['THETA0**']:<9.2f} {r['DeltaTheta']:<11.2f} {r['M']:.2f}")
 
