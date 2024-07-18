@@ -3,12 +3,7 @@ import numpy as np
 
 def calcul_poutre_continue(longueur_totale, longueurs_travees, charges):
     """
-    Calcule les moments et réactions pour une poutre continue.
-    
-    :param longueur_totale: Longueur totale de la poutre
-    :param longueurs_travees: Liste des longueurs de chaque travée
-    :param charges: Liste des charges uniformément réparties sur chaque travée
-    :return: Tuple contenant les moments aux appuis et les réactions
+    Calcule les moments et réactions pour une poutre continue avec des détails supplémentaires.
     """
     n_travees = len(longueurs_travees)
     n_appuis = n_travees + 1
@@ -21,6 +16,7 @@ def calcul_poutre_continue(longueur_totale, longueurs_travees, charges):
 
     # Calcul des moments d'encastrement parfait
     AEM = [q * L**2 / 12 for q, L in zip(charges, longueurs_travees)]
+    print("Moments d'encastrement parfait:", AEM)
 
     # Construction de la matrice des coefficients et du vecteur des termes constants
     A = np.zeros((n_appuis-2, n_appuis-2))
@@ -34,10 +30,16 @@ def calcul_poutre_continue(longueur_totale, longueurs_travees, charges):
             A[i, i+1] = longueurs_travees[i+1]
         B[i] = -6 * (AEM[i] + AEM[i+1])
 
+    print("Matrice A:")
+    print(A)
+    print("Vecteur B:", B)
+
     # Résolution du système d'équations
     moments_intermediaires = np.linalg.solve(A, B)
     moments = np.zeros(n_appuis)
     moments[1:-1] = moments_intermediaires
+
+    print("Moments intermédiaires:", moments_intermediaires)
 
     # Calcul des réactions
     reactions = np.zeros(n_appuis)
