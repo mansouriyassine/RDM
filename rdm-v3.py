@@ -15,9 +15,9 @@ class Travée:
         # Calcul de teta0 en utilisant la formule -D3*C3^3/24 (hypothétique)
         self.teta0 = -self.q * self.L**3 / 24
 
-    def calculer_Ma(self):
+    def calculer_Ma(self, teta0_suivant):
         # Calculer 6 * (teta0(i+1) - teta0(i))
-        delta_teta0 = self.teta0  # Hypothétique, à remplacer par le calcul réel
+        delta_teta0 = teta0_suivant - self.teta0
         moment = 6 * delta_teta0
         return moment
 
@@ -31,10 +31,16 @@ for i in range(1, nombre_travees + 1):
     travees.append(travee)
 
 # Calculer et afficher les résultats pour chaque travée
-for travee in travees:
+for i in range(len(travees)):
+    if i < len(travees) - 1:
+        teta_suivant = travees[i + 1].teta0
+    else:
+        teta_suivant = 0  # hypothétique, à ajuster selon la logique de votre modèle
+
+    travee = travees[i]
     travee.calculer_MT0()
     travee.calculer_teta0()
-    moment_Ma = travee.calculer_Ma()
+    moment_Ma = travee.calculer_Ma(teta_suivant)
     print(f"Travée {travee.numero} de longueur {travee.L} m et charge {travee.q} KN/m :")
     print(f"MT0 calculé : {travee.MT0} KN.m")
     print(f"teta0 calculé : {travee.teta0}")
