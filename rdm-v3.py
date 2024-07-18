@@ -34,12 +34,13 @@ def calculate_beam_properties(n, L, q, M):
     abs_cumul = 0
     
     for i in range(n):
-        MT0 = q[i] * L[i]**2 / 8  # Modification ici
+        MT0 = q[i] * L[i]**2 / 8
         q0_star = M[i+1]
-        q0_double_star = M[i]  # Modification ici
+        q0_double_star = M[i]
         x0 = L[i] / 2
         Ma = M[i] + (M[i+1] - M[i]) / 2 + q[i] * L[i]**2 / 8
         theta_0 = -q[i] * L[i]**3 / 24
+        theta_0_star = -q[i] * L[i]**3 / 24  # Nouvelle colonne THETA0*
         
         results.append({
             'Abs': abs_cumul,
@@ -50,7 +51,8 @@ def calculate_beam_properties(n, L, q, M):
             'q0**': q0_double_star,
             'Ma': Ma,
             'x0': x0,
-            'θ0': theta_0
+            'θ0': theta_0,
+            'THETA0*': theta_0_star
         })
         
         abs_cumul += L[i]
@@ -58,9 +60,9 @@ def calculate_beam_properties(n, L, q, M):
     return results
 
 def print_results(results):
-    print("\nAbs   L     q    MT0    q0*    q0**   Ma     x0    θ0                        -   KN.m x EI")
+    print("\nAbs   L     q    MT0    q0*    q0**   Ma     x0    θ0    THETA0*                   -   KN.m x EI")
     for r in results:
-        print(f"{r['Abs']:<5.2f} {r['L']:<5.2f} {r['q']:<5.2f} {r['MT0']:<6.2f} {r['q0*']:<7.2f} {r['q0**']:<7.2f} {r['Ma']:<7.2f} {r['x0']:<6.2f} {r['θ0']:<7.2f}")
+        print(f"{r['Abs']:<5.2f} {r['L']:<5.2f} {r['q']:<5.2f} {r['MT0']:<6.2f} {r['q0*']:<7.2f} {r['q0**']:<7.2f} {r['Ma']:<7.2f} {r['x0']:<6.2f} {r['θ0']:<7.2f} {r['THETA0*']:<7.2f}")
 
 def main():
     n, L, q = get_input()
