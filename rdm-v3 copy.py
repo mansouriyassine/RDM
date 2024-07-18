@@ -20,17 +20,13 @@ def calculate_beam_properties(n, L, q):
         'L': '-',
         'q': '-',
         'MT0': '-',
-        'THETA0*': 0,  # Initialisation à 0 pour le calcul de DeltaTheta
-        'THETA0**': '-',
-        'DeltaTheta': '-'
+        'THETA0*': '-',
+        '6ΔΘ0': '-'
     })
     
     for i in range(n):
         MT0 = q[i] * L[i]**2 / 8
         theta_0_star = -q[i] * L[i]**3 / 24
-        theta_0_star_star = -theta_0_star
-        
-        delta_theta = 6 * (theta_0_star - results[-1]['THETA0*'])
         
         abs_cumul += L[i]
         
@@ -41,20 +37,26 @@ def calculate_beam_properties(n, L, q):
             'q': q[i],
             'MT0': MT0,
             'THETA0*': theta_0_star,
-            'THETA0**': theta_0_star_star,
-            'DeltaTheta': delta_theta
+            '6ΔΘ0': None  # Sera calculé après
         })
+    
+    # Calculer 6ΔΘ0
+    for i in range(1, len(results)-1):
+        delta_theta = 6 * (results[i+1]['THETA0*'] - results[i]['THETA0*'])
+        results[i]['6ΔΘ0'] = delta_theta
     
     return results
 
 def print_results(results):
-    print("\nAbs     L       q     MT0    THETA0*   THETA0**  DeltaTheta")
-    print("        m     kN/m   kN.m   kN.m x EI  kN.m x EI  kN.m x EI")
+    print("\nAbs     L       q     MT0    THETA0*   6ΔΘ0")
+    print("        m     kN/m   kN.m   kN.m x EI  kN.m x EI")
     for r in results:
         if r['x'] == 'x0':
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['THETA0**']:<9} {r['DeltaTheta']:<9}")
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['6ΔΘ0']:<9}")
         else:
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {r['THETA0**']:<9.2f} {r['DeltaTheta']:<9.2f}")
+            delta_theta = r['6ΔΘ0']
+            delta_theta_str = f"{delta_theta:.2f}" if delta_theta is not None else "-"
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {delta_theta_str:<9}")
 
 def main():
     n, L, q = get_input()
