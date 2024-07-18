@@ -15,6 +15,7 @@ def calcul_trois_moments(n_travees, longueurs, charges):
     A = np.zeros((n_appuis, n_appuis))
     B = np.zeros(n_appuis)
     
+    print("\nÉquations du système :")
     for i in range(1, n_travees):
         L1, L2 = longueurs[i-1], longueurs[i]
         q1, q2 = charges[i-1], charges[i]
@@ -22,8 +23,11 @@ def calcul_trois_moments(n_travees, longueurs, charges):
         A[i, i] = 2 * (L1 + L2)
         A[i, i+1] = L2
         B[i] = -(q1 * L1**3 / 6 + q2 * L2**3 / 6)
+        print(f"Équation {i}: {L1:.2f}M{i-1} + {2*(L1+L2):.2f}M{i} + {L2:.2f}M{i+1} = {-B[i]:.2f}")
     
     A[0, 0] = A[-1, -1] = 1
+    print(f"Condition limite: M0 = 0")
+    print(f"Condition limite: M{n_travees} = 0")
     
     return A, B
 
