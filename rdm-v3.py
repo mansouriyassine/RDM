@@ -62,7 +62,7 @@ def affichage_resultats(longueurs, charges, moments_appuis, MT0, q0):
         q = charges[i]
         Ma = moments_appuis[i]
         x_max = calcul_position_moment_max(L, q, Ma, moments_appuis[i+1])
-        print(f"{abs_cumul:.2f}\t{L:.2f}\t{q:.2f}\t{MT0[i]:.3f}\t{q0[i]/2:.3f}\t{-q0[i]/2:.3f}\t{Ma:.2f}\t{x_max:.2f}")
+        print(f"{abs_cumul:.2f}\t{L:.2f}\t{q:.2f}\t{MT0[i]:.3f}\t{q0[i]:.3f}\t{q0[i]:.3f}\t{Ma:.2f}\t{x_max:.2f}")
         abs_cumul += L
     print(f"{abs_cumul:.2f}\t\t\t\t\t\t{moments_appuis[-1]:.2f}")
 
