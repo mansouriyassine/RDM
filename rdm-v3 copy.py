@@ -37,7 +37,7 @@ def calculate_beam_properties(n, L, q):
             'q': q[i],
             'MT0': MT0,
             'THETA0*': theta_0_star,
-            '6ΔΘ0': '-'  # Sera calculé après
+            '6ΔΘ0': None  # Sera calculé après
         })
     
     # Calculer 6ΔΘ0
@@ -54,7 +54,9 @@ def print_results(results):
         if r['x'] == 'x0':
             print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['6ΔΘ0']:<9}")
         else:
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {r['6ΔΘ0']:<9.2f}")
+            delta_theta = r['6ΔΘ0']
+            delta_theta_str = f"{delta_theta:.2f}" if delta_theta is not None else "-"
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {delta_theta_str:<9}")
 
 def main():
     n, L, q = get_input()
