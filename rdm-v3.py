@@ -9,16 +9,17 @@ def saisie_donnees():
     for i in range(n_travees):
         longueurs.append(float(input(f"Entrez la longueur de la travée {i+1} (en m) : ")))
         charges.append(float(input(f"Entrez la charge uniformément répartie sur la travée {i+1} (en kN/m) : ")))
-    return n_travees, longueurs, charges
+    EI = float(input("Entrez la valeur de EI (kN.m²) : "))
+    return n_travees, longueurs, charges, EI
 
-def calcul_trois_moments(n_travees, longueurs, charges):
+def calcul_trois_moments(n_travees, longueurs, charges, EI):
     n_appuis = n_travees + 1
     A = np.zeros((n_appuis, n_appuis))
     B = np.zeros(n_appuis)
     
     # Calcul des termes intermédiaires
     MT0 = [q * L**2 / 8 for q, L in zip(charges, longueurs)]
-    q0 = [6 * mt / L for mt, L in zip(MT0, longueurs)]
+    theta = [q * L**3 / (24 * EI) for q, L in zip(charges, longueurs)]
     
     # Construction du système d'équations
     for i in range(1, n_travees):
@@ -26,12 +27,12 @@ def calcul_trois_moments(n_travees, longueurs, charges):
         A[i, i-1] = L1
         A[i, i] = 2 * (L1 + L2)
         A[i, i+1] = L2
-        B[i] = -(q0[i-1] * L1 + q0[i] * L2)
+        B[i] = -6 * EI * (theta[i] / L2 + theta[i-1] / L1)
     
     # Conditions aux limites : moments nuls aux extrémités pour une poutre simplement appuyée
     A[0, 0] = A[-1, -1] = 1
     
-    return A, B, MT0, q0
+    return A, B, MT0, theta
 
 def resolution_systeme(A, B):
     return np.linalg.solve(A, B)
@@ -53,7 +54,7 @@ def calcul_position_moment_max(L, q, M1, M2):
     x_max = (L/2) - (M2 - M1) / (q * L)
     return min(max(x_max, 0), L)  # Assure que x_max est entre 0 et L
 
-def affichage_resultats(longueurs, charges, moments_appuis, MT0, q0):
+def affichage_resultats(longueurs, charges, moments_appuis, MT0, theta, EI):
     print("\nRésultats détaillés:")
     print("Abs\tL\tq\tMT0\tq0*\tq0**\tMa\tx")
     abs_cumul = 0
@@ -62,7 +63,8 @@ def affichage_resultats(longueurs, charges, moments_appuis, MT0, q0):
         q = charges[i]
         Ma = moments_appuis[i]
         x_max = calcul_position_moment_max(L, q, Ma, moments_appuis[i+1])
-        print(f"{abs_cumul:.2f}\t{L:.2f}\t{q:.2f}\t{MT0[i]:.3f}\t{q0[i]:.3f}\t{q0[i]:.3f}\t{Ma:.2f}\t{x_max:.2f}")
+        q0 = 6 * EI * theta[i] / L**3
+        print(f"{abs_cumul:.2f}\t{L:.2f}\t{q:.2f}\t{MT0[i]:.3f}\t{q0:.3f}\t{q0:.3f}\t{Ma:.2f}\t{x_max:.2f}")
         abs_cumul += L
     print(f"{abs_cumul:.2f}\t\t\t\t\t\t{moments_appuis[-1]:.2f}")
 
@@ -89,10 +91,10 @@ def affichage_resultats(longueurs, charges, moments_appuis, MT0, q0):
     plt.show()
 
 def main():
-    n_travees, longueurs, charges = saisie_donnees()
-    A, B, MT0, q0 = calcul_trois_moments(n_travees, longueurs, charges)
+    n_travees, longueurs, charges, EI = saisie_donnees()
+    A, B, MT0, theta = calcul_trois_moments(n_travees, longueurs, charges, EI)
     moments_appuis = resolution_systeme(A, B)
-    affichage_resultats(longueurs, charges, moments_appuis, MT0, q0)
+    affichage_resultats(longueurs, charges, moments_appuis, MT0, theta, EI)
 
 if __name__ == "__main__":
     main()
