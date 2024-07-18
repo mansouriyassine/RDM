@@ -14,9 +14,20 @@ def calculate_beam_properties(n, L, q):
     results = []
     abs_cumul = 0
     
+    results.append({
+        'x': 'x0',
+        'Abs': abs_cumul,
+        'L': '-',
+        'q': '-',
+        'MT0': '-',
+        'THETA0*': '-'
+    })
+    
     for i in range(n):
         MT0 = q[i] * L[i]**2 / 8
         theta_0_star = -q[i] * L[i]**3 / 24
+        
+        abs_cumul += L[i]
         
         results.append({
             'x': f'x{i+1}',
@@ -26,17 +37,17 @@ def calculate_beam_properties(n, L, q):
             'MT0': MT0,
             'THETA0*': theta_0_star
         })
-        
-        abs_cumul += L[i]
     
     return results
 
 def print_results(results):
-    print("\nAbs L q MT0 KN.m THETA0* x0")
-    print("                    KN.m x EI")
+    print("\nAbs     L       q     MT0    THETA0*")
+    print("        m     kN/m   kN.m   kN.m x EI")
     for r in results:
-        print(f"{r['x']:<4} {r['Abs']:<6.2f} {r['L']:<6.2f} {r['q']:<5.2f} {r['MT0']:<6.2f} {r['THETA0*']:<9.2f}")
-        print(f"{'':4} {r['Abs']+r['L']:<6.2f}")
+        if r['x'] == 'x0':
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<7}")
+        else:
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f}")
 
 def main():
     n, L, q = get_input()
