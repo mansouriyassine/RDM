@@ -54,18 +54,45 @@ def calculate_beam_properties(n, L, q):
     
     return results
 
+def calculate_support_moments(results):
+    n = len(results) - 2  # nombre d'équations (nombre d'appuis intérieurs)
+    
+    # Construire la matrice A
+    A = np.zeros((n, n))
+    for i in range(n):
+        if i > 0:
+            A[i, i-1] = results[i]['L']
+        A[i, i] = 2 * (results[i]['L'] + results[i+1]['L'])
+        if i < n-1:
+            A[i, i+1] = results[i+1]['L']
+    
+    # Construire le vecteur b
+    b = np.array([results[i+1]['DeltaTheta'] for i in range(n)])
+    
+    # Résoudre le système d'équations
+    moments = np.linalg.solve(A, b)
+    
+    # Ajouter les moments aux résultats
+    for i in range(1, len(results)-1):
+        results[i]['M'] = moments[i-1]
+    results[0]['M'] = 0  # Moment nul au premier appui
+    results[-1]['M'] = 0  # Moment nul au dernier appui
+    
+    return results
+
 def print_results(results):
-    print("\nAbs     L       q     MT0    THETA0*   THETA0**  DeltaTheta")
-    print("        m     kN/m   kN.m   kN.m x EI  kN.m x EI  kN.m x EI")
+    print("\nAbs     L       q     MT0    THETA0*   THETA0**  DeltaTheta   M")
+    print("        m     kN/m   kN.m   kN.m x EI  kN.m x EI  kN.m x EI   kN.m")
     for r in results:
         if r['x'] == 'x0':
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['THETA0**']:<9} {r['DeltaTheta']:<9}")
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7} {r['q']:<7} {r['MT0']:<7} {r['THETA0*']:<9} {r['THETA0**']:<9} {r['DeltaTheta']:<11} {r['M']:.2f}")
         else:
-            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {r['THETA0**']:<9.2f} {r['DeltaTheta']:<9}")
+            print(f"{r['x']:<4} {r['Abs']:<7.2f} {r['L']:<7.2f} {r['q']:<7.2f} {r['MT0']:<7.2f} {r['THETA0*']:<9.2f} {r['THETA0**']:<9.2f} {r['DeltaTheta']:<11.2f} {r['M']:.2f}")
 
 def main():
     n, L, q = get_input()
     results = calculate_beam_properties(n, L, q)
+    results = calculate_support_moments(results)
     print_results(results)
 
 if __name__ == "__main__":
