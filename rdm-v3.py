@@ -34,11 +34,11 @@ def calculate_beam_properties(n, L, q, M):
     abs_cumul = 0
     
     for i in range(n):
-        MT0 = M[i]
+        MT0 = q[i] * L[i]**2 / 8  # Modification ici
         q0_star = M[i+1]
-        q0_double_star = MT0
+        q0_double_star = M[i]  # Modification ici
         x0 = L[i] / 2
-        Ma = MT0 + (q0_star - MT0) / 2 + q[i] * L[i]**2 / 8
+        Ma = M[i] + (M[i+1] - M[i]) / 2 + q[i] * L[i]**2 / 8
         theta_0 = -q[i] * L[i]**3 / 24
         
         results.append({
