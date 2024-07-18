@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import numpy as np
+
 def get_input_data():
     num_travees = int(input("Entrez le nombre de travées : "))
     longueurs = []
@@ -28,10 +30,13 @@ def calculer_moments(num_travees, longueurs, charges):
         A[i][i] = 2 * (Li + Li1)
         A[i][i + 1] = Li1
         
-        B[i] = 6 * EI * ((qi1 * Li1**3 / 24 + qi * Li**3 / 24) / EI)
+        B[i] = 6 * ((qi1 * Li1**2 / 24) + (qi * Li**2 / 24))
+    
+    # Appliquer les conditions aux limites pour rendre la matrice inversible
+    A[0][0] = 1
+    A[-1][-1] = 1
     
     # Résolution du système d'équations
-    import numpy as np
     A = np.array(A)
     B = np.array(B)
     moments = np.linalg.solve(A, B)
