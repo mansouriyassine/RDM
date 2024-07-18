@@ -1,52 +1,49 @@
 #!/usr/bin/env python3
-import numpy as np
-
-def saisie_donnees():
-    n_travees = int(input("Entrez le nombre de travées : "))
+def get_input_data():
+    num_travees = int(input("Entrez le nombre de travées : "))
     longueurs = []
     charges = []
-    for i in range(n_travees):
-        longueurs.append(float(input(f"Entrez la longueur de la travée {i+1} (en m) : ")))
-        charges.append(float(input(f"Entrez la charge uniformément répartie sur la travée {i+1} (en kN/m) : ")))
-    return n_travees, longueurs, charges
+    for i in range(1, num_travees + 1):
+        longueur = float(input(f"Entrez la longueur de la travée {i} (en m) : "))
+        charge = float(input(f"Entrez la charge uniformément répartie sur la travée {i} (en kN/m) : "))
+        longueurs.append(longueur)
+        charges.append(charge)
+    return num_travees, longueurs, charges
 
-def calcul_trois_moments(n_travees, longueurs, charges):
-    n_appuis = n_travees + 1
-    A = np.zeros((n_appuis, n_appuis))
-    B = np.zeros(n_appuis)
+def calculer_moments(num_travees, longueurs, charges):
+    EI = 1  # On suppose que EI est constant et égal à 1 pour simplifier les calculs
+    moments = [0] * (num_travees + 1)
     
-    print("\nÉquations du système :")
-    for i in range(1, n_travees):
-        L1, L2 = longueurs[i-1], longueurs[i]
-        q1, q2 = charges[i-1], charges[i]
-        A[i, i-1] = L1
-        A[i, i] = 2 * (L1 + L2)
-        A[i, i+1] = L2
-        B[i] = -(q1 * L1**3 / 6 + q2 * L2**3 / 6)
-        print(f"Équation {i}: {L1:.2f}M{i-1} + {2*(L1+L2):.2f}M{i} + {L2:.2f}M{i+1} = {-B[i]:.2f}")
+    # Construction du système d'équations
+    A = [[0 for _ in range(num_travees + 1)] for _ in range(num_travees + 1)]
+    B = [0] * (num_travees + 1)
     
-    A[0, 0] = A[-1, -1] = 1
-    print(f"Condition limite: M0 = 0")
-    print(f"Condition limite: M{n_travees} = 0")
+    for i in range(1, num_travees):
+        Li = longueurs[i - 1]
+        Li1 = longueurs[i]
+        qi = charges[i - 1]
+        qi1 = charges[i]
+        
+        A[i][i - 1] = Li
+        A[i][i] = 2 * (Li + Li1)
+        A[i][i + 1] = Li1
+        
+        B[i] = 6 * EI * ((qi1 * Li1**3 / 24 + qi * Li**3 / 24) / EI)
     
-    return A, B
-
-def resolution_systeme(A, B):
-    return np.linalg.solve(A, B)
-
-def affichage_resultats(longueurs, moments_appuis):
-    print("\nMoments aux appuis (kN.m):")
-    abs_cumul = 0
-    for i, L in enumerate(longueurs):
-        print(f"Appui {i}: x = {abs_cumul:.2f} m, M = {moments_appuis[i]:.2f}")
-        abs_cumul += L
-    print(f"Appui {len(longueurs)}: x = {abs_cumul:.2f} m, M = {moments_appuis[-1]:.2f}")
+    # Résolution du système d'équations
+    import numpy as np
+    A = np.array(A)
+    B = np.array(B)
+    moments = np.linalg.solve(A, B)
+    
+    return moments
 
 def main():
-    n_travees, longueurs, charges = saisie_donnees()
-    A, B = calcul_trois_moments(n_travees, longueurs, charges)
-    moments_appuis = resolution_systeme(A, B)
-    affichage_resultats(longueurs, moments_appuis)
+    num_travees, longueurs, charges = get_input_data()
+    moments = calculer_moments(num_travees, longueurs, charges)
+    print("Moments aux appuis (kN.m):")
+    for i, moment in enumerate(moments):
+        print(f"Appui {i}: {moment:.2f} kN.m")
 
 if __name__ == "__main__":
     main()
