@@ -10,18 +10,19 @@ def calculate_moments(spans, loads):
     c = [0] + [spans[i] / 6 for i in range(n-1)] + [0]
     
     # Calcul des charges équivalentes
-    q = np.zeros(n+1)
-    q[1:n] = [-loads[i] * spans[i]**2 / 12 for i in range(n)]
+    q = [-loads[i] * spans[i]**2 / 12 for i in range(n)]
     
     # Construction de la matrice tridiagonale
-    A = np.zeros((n+1, n+1))
-    for i in range(1, n):
-        A[i, i-1] = a[i]
-        A[i, i] = b[i-1] + b[i]
-        A[i, i+1] = c[i]
+    A = np.zeros((n, n))
+    for i in range(n):
+        A[i, i] = b[i]
+        if i > 0:
+            A[i, i-1] = a[i]
+        if i < n-1:
+            A[i, i+1] = c[i]
     
     # Conditions aux limites (appuis simples aux extrémités)
-    A[0, 0] = A[n, n] = 1
+    A[0, 0] = A[n-1, n-1] = 1
     
     # Résolution du système d'équations
     moments = np.linalg.solve(A, q)
