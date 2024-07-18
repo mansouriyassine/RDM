@@ -16,10 +16,13 @@ class Travée:
         self.teta0 = -self.q * self.L**3 / 24
 
     def calculer_Ma(self, teta0_suivant):
-        # Calculer 6 * (teta0(i+1) - teta0(i))
-        delta_teta0 = teta0_suivant - self.teta0
-        moment = 6 * delta_teta0
-        return moment
+        if teta0_suivant is not None:
+            # Calculer 6 * (teta0(i+1) - teta0(i))
+            delta_teta0 = teta0_suivant - self.teta0
+            moment = 6 * delta_teta0
+            return moment
+        else:
+            return 0  # Si teta0_suivant est None (dernière travée), retourne 0 pour Ma
 
 # Demander le nombre de travées à l'utilisateur
 nombre_travees = int(input("Entrez le nombre de travées : "))
@@ -35,7 +38,7 @@ for i in range(len(travees)):
     if i < len(travees) - 1:
         teta_suivant = travees[i + 1].teta0
     else:
-        teta_suivant = 0  # hypothétique, à ajuster selon la logique de votre modèle
+        teta_suivant = None  # Marque la dernière travée avec teta_suivant comme None
 
     travee = travees[i]
     travee.calculer_MT0()
