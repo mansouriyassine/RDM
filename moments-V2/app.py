@@ -88,11 +88,8 @@ def calculate_span_moments(results):
 
 def plot_moments(results):
     plt.figure(figsize=(12, 6))
-    
-    x_supports = [r['Abs'] for r in results]
-    y_supports = [r['Ma'] for r in results]
-    plt.plot(x_supports, y_supports, 'bo-', label='Moments aux appuis')
 
+    # Tracer uniquement les moments en travée
     for i in range(1, len(results)):
         plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
     
@@ -100,11 +97,7 @@ def plot_moments(results):
     plt.ylabel('Moment fléchissant (kN.m)')
     plt.title('Diagramme des moments fléchissants')
     plt.grid(True)
-    plt.legend()
     
-    for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
-        plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
-
     if not os.path.exists('static'):
         os.makedirs('static')
     plt.savefig('static/moment_plot.png')
