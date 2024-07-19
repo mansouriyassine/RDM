@@ -72,18 +72,41 @@ def calculate_support_moments(results):
 
     return results
 
-def plot_moments(results):
-    x = [r['Abs'] for r in results]
-    y = [r['Ma'] for r in results]
+def calculate_span_moments(results):
+    for i in range(1, len(results)):
+        x = np.linspace(0, results[i]['L'], 100)
+        M_left = results[i-1]['Ma']
+        M_right = results[i]['Ma']
+        q = results[i]['q']
+        L = results[i]['L']
+        
+        M = M_left + (M_right - M_left) * x / L - q * x * (L - x) / 2
+        
+        results[i]['span_x'] = x + results[i-1]['Abs']
+        results[i]['span_M'] = M
+    
+    return results
 
+def plot_moments(results):
     plt.figure(figsize=(12, 6))
-    plt.plot(x, y, 'bo-')
+    
+    # Tracer les moments aux appuis
+    x_supports = [r['Abs'] for r in results]
+    y_supports = [r['Ma'] for r in results]
+    plt.plot(x_supports, y_supports, 'bo-', label='Moments aux appuis')
+    
+    # Tracer les moments en travées
+    for i in range(1, len(results)):
+        plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
+    
     plt.xlabel('Position sur la poutre (m)')
     plt.ylabel('Moment fléchissant (kN.m)')
     plt.title('Diagramme des moments fléchissants')
     plt.grid(True)
+    plt.legend()
 
-    for i, (xi, yi) in enumerate(zip(x, y)):
+    # Annotations pour les moments aux appuis
+    for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
         plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
 
     img = io.BytesIO()
@@ -104,6 +127,7 @@ def calculate():
 
     results = calculate_beam_properties(n, L, q)
     results = calculate_support_moments(results)
+    results = calculate_span_moments(results)
 
     app.results = results  # Stocke les résultats pour la génération du graphique
 
