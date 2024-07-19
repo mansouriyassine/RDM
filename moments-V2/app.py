@@ -93,6 +93,10 @@ def plot_moments(results):
     for i in range(1, len(results)):
         plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
     
+    # Annotations pour les moments aux appuis
+    for i in range(len(results)):
+        plt.annotate(f'{results[i]["Ma"]:.2f}', (results[i]['Abs'], results[i]['Ma']), textcoords="offset points", xytext=(0,10), ha='center')
+
     plt.xlabel('Position sur la poutre (m)')
     plt.ylabel('Moment fléchissant (kN.m)')
     plt.title('Diagramme des moments fléchissants')
