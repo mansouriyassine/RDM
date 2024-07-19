@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats du Calcul de Poutre Continue</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        img { max-width: 100%; height: auto; }
+        a { display: inline-block; margin-top: 20px; padding: 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+        a:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Résultats du Calcul de Poutre Continue</h1>
+    <table>
+        <tr>
+            <th>x</th>
+            <th>Abs (m)</th>
+            <th>L (m)</th>
+            <th>q (kN/m)</th>
+            <th>MT0 (kN.m)</th>
+            <th>THETA0* (kN.m x EI)</th>
+            <th>THETA0** (kN.m x EI)</th>
+            <th>DeltaTheta (kN.m x EI)</th>
+            <th>Ma (kN.m)</th>
+        </tr>
+        {% for r in results %}
+        <tr>
+            <td>{{ r.x }}</td>
+            <td>{{ "%.2f"|format(r.Abs) }}</td>
+            <td>{{ "%.2f"|format(r.L) if r.L else '-' }}</td>
+            <td>{{ "%.2f"|format(r.q) if r.q else '-' }}</td>
+            <td>{{ "%.2f"|format(r.MT0) if r.MT0 else '-' }}</td>
+            <td>{{ "%.2f"|format(r['THETA0*']) }}</td>
+            <td>{{ "%.2f"|format(r['THETA0**']) }}</td>
+            <td>{{ "%.2f"|format(r.DeltaTheta) }}</td>
+            <td>{{ "%.2f"|format(r.Ma) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Diagramme des moments fléchissants</h2>
+    <img src="{{ url_for('get_plot') }}" alt="Diagramme des moments fléchissants">
+
+    <a href="/" onclick="return confirm('Êtes-vous sûr de vouloir retourner à l\'accueil ? Le graphique sera supprimé.')">Retour à l'accueil</a>
+</body>
+</html>
