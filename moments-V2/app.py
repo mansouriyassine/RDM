@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
+import os
 
 app = Flask(__name__)
 
@@ -93,10 +94,17 @@ def plot_moments(results):
     # Tracer les moments aux appuis
     x_supports = [r['Abs'] for r in results]
     y_supports = [r['Ma'] for r in results]
+    print("Moments aux appuis:")
+    for x, y in zip(x_supports, y_supports):
+        print(f"x: {x}, Ma: {y}")
     plt.plot(x_supports, y_supports, 'bo-', label='Moments aux appuis')
     
     # Tracer les moments en travées
+    print("Moments en travées:")
     for i in range(1, len(results)):
+        print(f"Travée {i}:")
+        print(f"x: {results[i]['span_x'][:5]}... (truncated)")
+        print(f"M: {results[i]['span_M'][:5]}... (truncated)")
         plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
     
     plt.xlabel('Position sur la poutre (m)')
@@ -109,11 +117,11 @@ def plot_moments(results):
     for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
         plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
 
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
+    # Sauvegarde de l'image localement
+    if not os.path.exists('static'):
+        os.makedirs('static')
+    plt.savefig('static/moment_plot.png')
     plt.close()
-    return img
 
 @app.route('/')
 def home():
@@ -135,8 +143,8 @@ def calculate():
 
 @app.route('/get_plot')
 def get_plot():
-    img = plot_moments(app.results)
-    return send_file(img, mimetype='image/png')
+    plot_moments(app.results)
+    return send_file('static/moment_plot.png', mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(debug=True)
