@@ -93,7 +93,7 @@ def plot_moments(results):
     
     # Tracer les moments aux appuis
     x_supports = [r['Abs'] for r in results]
-    y_supports = [r['Ma'] for r in results]
+    y_supports = [-r['Ma'] for r in results]  # Inverser le signe
     print("Moments aux appuis:")
     for x, y in zip(x_supports, y_supports):
         print(f"x: {x}, Ma: {y}")
@@ -105,7 +105,7 @@ def plot_moments(results):
         print(f"Travée {i}:")
         print(f"x: {results[i]['span_x'][:5]}... (truncated)")
         print(f"M: {results[i]['span_M'][:5]}... (truncated)")
-        plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
+        plt.plot(results[i]['span_x'], [-m for m in results[i]['span_M']], 'r-')  # Inverser le signe
     
     plt.xlabel('Position sur la poutre (m)')
     plt.ylabel('Moment fléchissant (kN.m)')
@@ -115,7 +115,10 @@ def plot_moments(results):
     
     # Annotations pour les moments aux appuis
     for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
-        plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
+        plt.annotate(f'{-yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,-10), ha='center')
+
+    # Inverser l'axe y
+    plt.gca().invert_yaxis()
 
     # Sauvegarde de l'image localement
     if not os.path.exists('static'):
