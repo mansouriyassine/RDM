@@ -65,11 +65,8 @@ def calculate_support_moments(results):
 
     moments = np.dot(A_inv, b)
 
-    for i in range(len(results)):
-        if i == 0 or i == len(results) - 1:
-            results[i]['Ma'] = 0
-        else:
-            results[i]['Ma'] = moments[i-1]
+    for i in range(1, len(results) - 1):
+        results[i]['Ma'] = moments[i-1]
 
     return results
 
@@ -81,7 +78,8 @@ def calculate_span_moments(results):
         q = results[i]['q']
         L = results[i]['L']
         
-        M = M_left + (M_right - M_left) * x / L - q * x * (L - x) / 2
+        # Calculer les moments en travée avec l'équation correcte
+        M = M_left * (1 - x / L) + M_right * (x / L) - q * x * (L - x) / 2
         
         results[i]['span_x'] = x + results[i-1]['Abs']
         results[i]['span_M'] = M
@@ -91,21 +89,12 @@ def calculate_span_moments(results):
 def plot_moments(results):
     plt.figure(figsize=(12, 6))
     
-    # Tracer les moments aux appuis
     x_supports = [r['Abs'] for r in results]
-    y_supports = [r['Ma'] for r in results]  # Ne pas inverser le signe
-    print("Moments aux appuis:")
-    for x, y in zip(x_supports, y_supports):
-        print(f"x: {x}, Ma: {y}")
+    y_supports = [r['Ma'] for r in results]
     plt.plot(x_supports, y_supports, 'bo-', label='Moments aux appuis')
-    
-    # Tracer les moments en travées
-    print("Moments en travées:")
+
     for i in range(1, len(results)):
-        print(f"Travée {i}:")
-        print(f"x: {results[i]['span_x'][:5]}... (truncated)")
-        print(f"M: {results[i]['span_M'][:5]}... (truncated)")
-        plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')  # Ne pas inverser le signe
+        plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
     
     plt.xlabel('Position sur la poutre (m)')
     plt.ylabel('Moment fléchissant (kN.m)')
@@ -113,14 +102,9 @@ def plot_moments(results):
     plt.grid(True)
     plt.legend()
     
-    # Annotations pour les moments aux appuis
     for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
         plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
 
-    # Ne pas inverser l'axe y
-    # plt.gca().invert_yaxis()  # Cette ligne est supprimée
-
-    # Sauvegarde de l'image localement
     if not os.path.exists('static'):
         os.makedirs('static')
     plt.savefig('static/moment_plot.png')
@@ -140,7 +124,7 @@ def calculate():
     results = calculate_support_moments(results)
     results = calculate_span_moments(results)
 
-    app.results = results  # Stocke les résultats pour la génération du graphique
+    app.results = results
 
     return render_template('resultats.html', results=results, n=n)
 
