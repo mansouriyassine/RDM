@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Utiliser un backend non-interactif
 import matplotlib.pyplot as plt
 
 def get_input():
@@ -114,7 +116,9 @@ def plot_moments(results):
     for i, (xi, yi) in enumerate(zip(x, y)):
         plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
     
-    plt.show()
+    # Sauvegarder le graphique au lieu de l'afficher
+    plt.savefig('moments_flechissants.png')
+    print("Le graphique a été sauvegardé sous le nom 'moments_flechissants.png'")
 
 def main():
     n, L, q = get_input()
