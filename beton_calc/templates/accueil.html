@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BétonCalc - Calculateur de mélange de béton</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; text-align: center; }
+        form { max-width: 500px; margin: 0 auto; }
+        label { display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        input[type="submit"] { background-color: #4CAF50; color: white; border: none; cursor: pointer; margin-top: 20px; }
+        input[type="submit"]:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>BétonCalc - Calculateur de mélange de béton</h1>
+    <form action="/calculer" method="post">
+        <label for="resistance">Résistance à la compression souhaitée (MPa) :</label>
+        <input type="number" id="resistance" name="resistance" min="20" max="50" required>
+
+        <label for="type_utilisation">Type d'utilisation :</label>
+        <select id="type_utilisation" name="type_utilisation" required>
+            <option value="fondations">Fondations</option>
+            <option value="dalle">Dalle</option>
+            <option value="murs">Murs</option>
+        </select>
+
+        <label for="type_ciment">Type de ciment :</label>
+        <select id="type_ciment" name="type_ciment" required>
+            <option value="cpj35">CPJ35</option>
+            <option value="cpj45">CPJ45</option>
+            <option value="cpa55">CPA55</option>
+        </select>
+
+        <label for="taille_max_agregats">Taille maximale des agrégats (mm) :</label>
+        <input type="number" id="taille_max_agregats" name="taille_max_agregats" min="5" max="40" required>
+
+        <label for="type_sable">Type de sable :</label>
+        <select id="type_sable" name="type_sable" required>
+            <option value="fin">Fin</option>
+            <option value="moyen">Moyen</option>
+            <option value="grossier">Grossier</option>
+        </select>
+
+        <label for="temperature">Température ambiante (°C) :</label>
+        <input type="number" id="temperature" name="temperature" min="0" max="50" required>
+
+        <label for="humidite">Humidité relative (%) :</label>
+        <input type="number" id="humidite" name="humidite" min="0" max="100" required>
+
+        <label for="consistance">Consistance souhaitée :</label>
+        <select id="consistance" name="consistance" required>
+            <option value="ferme">Ferme</option>
+            <option value="plastique">Plastique</option>
+            <option value="très plastique">Très plastique</option>
+            <option value="fluide">Fluide</option>
+        </select>
+
+        <input type="submit" value="Calculer">
+    </form>
+</body>
+</html>
