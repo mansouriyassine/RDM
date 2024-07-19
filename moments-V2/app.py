@@ -90,24 +90,29 @@ def calculate_span_moments(results):
 def plot_moments(results):
     plt.figure(figsize=(12, 6))
     
-    # Tracer les moments aux appuis
+    # Inverser le signe des moments
+    y_supports = [-r['Ma'] for r in results]
     x_supports = [r['Abs'] for r in results]
-    y_supports = [r['Ma'] for r in results]
+
+    # Tracer les moments aux appuis
     plt.plot(x_supports, y_supports, 'bo-', label='Moments aux appuis')
     
-    # Tracer les moments en travées
+    # Tracer les moments en travées (inversés)
     for i in range(1, len(results)):
-        plt.plot(results[i]['span_x'], results[i]['span_M'], 'r-')
+        plt.plot(results[i]['span_x'], [-m for m in results[i]['span_M']], 'r-')
     
     plt.xlabel('Position sur la poutre (m)')
     plt.ylabel('Moment fléchissant (kN.m)')
     plt.title('Diagramme des moments fléchissants')
     plt.grid(True)
     plt.legend()
+    
+    # Inverser l'axe y
+    plt.gca().invert_yaxis()
 
     # Annotations pour les moments aux appuis
     for i, (xi, yi) in enumerate(zip(x_supports, y_supports)):
-        plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,10), ha='center')
+        plt.annotate(f'{yi:.2f}', (xi, yi), textcoords="offset points", xytext=(0,-10), ha='center')
 
     img = io.BytesIO()
     plt.savefig(img, format='png')
