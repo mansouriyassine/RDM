@@ -78,8 +78,8 @@ def calculate_span_moments(results):
         q = results[i]['q']
         L = results[i]['L']
         
-        # Calculer les moments en travée avec l'équation correcte
-        M = M_left * (1 - x / L) + M_right * (x / L) - q * x * (L - x) / 2
+        # Calculer les moments en travée avec l'équation fournie
+        M = M_left * (1 - x / L) + M_right * (x / L) + q * x * (L - x) / 2
         
         results[i]['span_x'] = x + results[i-1]['Abs']
         results[i]['span_M'] = M
