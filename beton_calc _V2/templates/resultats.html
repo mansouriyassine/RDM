@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - BétonCalc</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .warning { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; margin-top: 20px; border-radius: 5px; }
+        .back-link { display: block; margin-top: 20px; text-align: center; }
+        .download-btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Résultats du calcul de mélange de béton</h1>
+    <table>
+        <tr><th>Paramètre</th><th>Valeur</th></tr>
+        <tr><td>Ciment (kg/m³)</td><td>{{ resultat.ciment }}</td></tr>
+        <tr><td>Eau (litres/m³)</td><td>{{ resultat.eau }}</td></tr>
+        <tr><td>Sable (kg/m³)</td><td>{{ resultat.sable }}</td></tr>
+        <tr><td>Gros agrégats (kg/m³)</td><td>{{ resultat.gros_agregats }}</td></tr>
+        <tr><td>Rapport eau/ciment</td><td>{{ resultat.rapport_eau_ciment }}</td></tr>
+        <tr><td>Classe de consistance</td><td>{{ resultat.classe_consistance }}</td></tr>
+        <tr><td>Dosage minimal en ciment (kg/m³)</td><td>{{ resultat.dosage_minimal_ciment }}</td></tr>
+        <tr><td>Temps de malaxage (secondes)</td><td>{{ resultat.temps_malaxage }}</td></tr>
+        <tr><td>Durée de prise (heures)</td><td>{{ resultat.duree_prise }}</td></tr>
+        <tr><td>Résistance estimée à 7 jours (MPa)</td><td>{{ resultat.resistance_estimee_7j }}</td></tr>
+        <tr><td>Résistance estimée à 28 jours (MPa)</td><td>{{ resultat.resistance_estimee_28j }}</td></tr>
+    </table>
+    <div class="warning">
+        <p><strong>Attention :</strong> Ces résultats sont basés sur des calculs simplifiés et ne remplacent pas l'expertise d'un professionnel. Assurez-vous de respecter les normes marocaines en vigueur pour la formulation du béton.</p>
+    </div>
+    <a href="{{ url_for('telecharger_pdf', 
+                        resistance=resultat.resistance_estimee_28j, 
+                        type_utilisation=form_data.type_utilisation,
+                        type_ciment=form_data.type_ciment,
+                        taille_max_agregats=form_data.taille_max_agregats,
+                        type_sable=form_data.type_sable,
+                        temperature=form_data.temperature,
+                        humidite=form_data.humidite,
+                        consistance=form_data.consistance) }}" 
+       class="download-btn">Télécharger en PDF</a>
+    <a href="/" class="back-link">Retour à la page d'accueil</a>
+</body>
+</html>
