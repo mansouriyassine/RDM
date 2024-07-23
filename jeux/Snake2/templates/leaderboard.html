@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Leaderboard</h2>
+    <div class="bg-[#1a321a] border border-[#346534] rounded-lg overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-[#244724]">
+                    <th class="px-4 py-2 text-left">Name</th>
+                    <th class="px-4 py-2 text-left">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for score in scores %}
+                <tr class="border-t border-[#346534]">
+                    <td class="px-4 py-2">{{ score.name }}</td>
+                    <td class="px-4 py-2 text-[#93c893]">{{ score.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
