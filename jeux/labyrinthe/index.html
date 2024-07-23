@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Labyrinthe</title>
+    <style>
+        #maze {
+            display: grid;
+            gap: 1px;
+        }
+        .cell {
+            width: 20px;
+            height: 20px;
+        }
+        .wall { background-color: black; }
+        .path { background-color: white; }
+        .start { background-color: green; }
+        .end { background-color: red; }
+        .player { background-color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Jeu de Labyrinthe</h1>
+    <div id="maze"></div>
+    <script>
+        const mazeElement = document.getElementById('maze');
+        let playerPosition = { x: 0, y: 0 };
+        let maze = [];
+
+        function fetchMaze() {
+            fetch('/get_maze')
+                .then(response => response.json())
+                .then(data => {
+                    maze = data;
+                    renderMaze();
+                    playerPosition = { x: 0, y: 0 };
+                });
+        }
+
+        function renderMaze() {
+            mazeElement.innerHTML = '';
+            mazeElement.style.gridTemplateColumns = `repeat(${maze[0].length}, 20px)`;
+            
+            maze.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    const cellElement = document.createElement('div');
+                    cellElement.className = 'cell';
+                    if (cell === 1) cellElement.classList.add('wall');
+                    else if (cell === 2) cellElement.classList.add('start');
+                    else if (cell === 3) cellElement.classList.add('end');
+                    else cellElement.classList.add('path');
+                    
+                    if (x === playerPosition.x && y === playerPosition.y) {
+                        cellElement.classList.add('player');
+                    }
+                    
+                    mazeElement.appendChild(cellElement);
+                });
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            const directions = {
+                'ArrowUp': { dx: 0, dy: -1 },
+                'ArrowDown': { dx: 0, dy: 1 },
+                'ArrowLeft': { dx: -1, dy: 0 },
+                'ArrowRight': { dx: 1, dy: 0 }
+            };
+            
+            if (key in directions) {
+                const { dx, dy } = directions[key];
+                const newX = playerPosition.x + dx;
+                const newY = playerPosition.y + dy;
+                
+                if (newX >= 0 && newX < maze[0].length && 
+                    newY >= 0 && newY < maze.length && 
+                    maze[newY][newX] !== 1) {
+                    playerPosition = { x: newX, y: newY };
+                    renderMaze();
+                    
+                    if (maze[newY][newX] === 3) {
+                        alert('Félicitations ! Vous avez trouvé la sortie !');
+                        fetchMaze();
+                    }
+                }
+            }
+        });
+
+        fetchMaze();
+    </script>
+</body>
+</html>
