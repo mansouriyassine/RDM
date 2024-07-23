@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu Snake</title>
+    <style>
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat({{ grid_size }}, 20px);
+            gap: 1px;
+            background-color: #ccc;
+            border: 1px solid #999;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+        }
+        .snake {
+            background-color: green;
+        }
+        .food {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jeu Snake</h1>
+    <button onclick="startGame()">Nouvelle partie</button>
+    <div id="game-board"></div>
+    <div id="score">Score: 0</div>
+
+    <script>
+        const gridSize = {{ grid_size }};
+        let snake, food, direction, gameInterval;
+        let score = 0;
+
+        function createBoard() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                board.appendChild(cell);
+            }
+        }
+
+        function updateBoard() {
+            const cells = document.getElementsByClassName('cell');
+            for (let i = 0; i < cells.length; i++) {
+                cells[i].classList.remove('snake', 'food');
+            }
+            snake.forEach(([x, y]) => {
+                cells[x * gridSize + y].classList.add('snake');
+            });
+            cells[food[0] * gridSize + food[1]].classList.add('food');
+        }
+
+        function startGame() {
+            fetch('/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    snake = data.snake;
+                    food = data.food;
+                    direction = 'RIGHT';
+                    score = 0;
+                    document.getElementById('score').textContent = `Score: ${score}`;
+                    createBoard();
+                    updateBoard();
+                    if (gameInterval) clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, 200);
+                });
+        }
+
+        function gameLoop() {
+            fetch('/move', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ direction: direction })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.game_over) {
+                    alert('Game Over! Votre score: ' + score);
+                    clearInterval(gameInterval);
+                } else {
+                    snake = data.snake;
+                    food = data.food;
+                    updateBoard();
+                    if (snake.length > score + 1) {
+                        score++;
+                        document.getElementById('score').textContent = `Score: ${score}`;
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+            else if (key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+            else if (key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+            else if (key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+        });
+
+        createBoard();
+    </script>
+</body>
+</html>
