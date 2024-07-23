@@ -1,10 +1,11 @@
 from flask import Flask, render_template, jsonify
 from random import randint
+import os
 
 app = Flask(__name__)
 
 def generate_maze(width, height):
-    # Initialiser le labyrinthe avec des murs partout
+    # Le code de génération du labyrinthe reste inchangé
     maze = [[1 for _ in range(width)] for _ in range(height)]
     
     def carve_path(x, y):
@@ -16,11 +17,9 @@ def generate_maze(width, height):
                 maze[y+dy][x+dx] = 0
                 carve_path(nx, ny)
     
-    # Commencer à un point aléatoire
     start_x, start_y = randint(0, width-1), randint(0, height-1)
     carve_path(start_x, start_y)
     
-    # Définir l'entrée et la sortie
     maze[0][0] = 2  # Entrée
     maze[height-1][width-1] = 3  # Sortie
     
