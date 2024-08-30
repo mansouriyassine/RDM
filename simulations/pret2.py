@@ -45,19 +45,29 @@ def find_optimal_loan_option(options, monthly_income, monthly_expenses):
     
     return optimal_option, shortest_repayment_period
 
-# User inputs for different loan options
-loan_options = [
-    (1000000, 4.5 / 100, 15),
-    (1000000, 3.8 / 100, 20),
-    (1000000, 5.0 / 100, 10),
-    # Add more options if needed
-]
+# Collecting user inputs
+loan_options = []
 
-# User inputs for monthly income and expenses
-monthly_income = 25000
-monthly_expenses = 4300
+print("Entrez les options de crédit. Entrez 'stop' pour terminer la saisie.")
+while True:
+    try:
+        principal = input("Entrez le montant du prêt (MAD) ou 'stop' pour finir: ")
+        if principal.lower() == 'stop':
+            break
+        principal = float(principal)
+        annual_rate = float(input("Entrez le taux d'intérêt annuel (%) : ")) / 100
+        loan_term_years = int(input("Entrez la durée du prêt (en années) : "))
+        loan_options.append((principal, annual_rate, loan_term_years))
+    except ValueError:
+        print("Veuillez entrer une valeur valide.")
 
-optimal_option, optimal_period = find_optimal_loan_option(loan_options, monthly_income, monthly_expenses)
+if loan_options:
+    monthly_income = float(input("Entrez le revenu mensuel (MAD) : "))
+    monthly_expenses = float(input("Entrez les charges mensuelles (MAD) : "))
 
-print(f"La meilleure option de crédit est: Principal: {optimal_option[0]} MAD, Taux d'intérêt annuel: {optimal_option[1] * 100}%, Durée: {optimal_option[2]} ans.")
-print(f"Durée de remboursement estimée : {optimal_period} mois (environ {optimal_period // 12} ans et {optimal_period % 12} mois).")
+    optimal_option, optimal_period = find_optimal_loan_option(loan_options, monthly_income, monthly_expenses)
+
+    print(f"\nLa meilleure option de crédit est: Principal: {optimal_option[0]:,.2f} MAD, Taux d'intérêt annuel: {optimal_option[1] * 100:.2f}%, Durée: {optimal_option[2]} ans.")
+    print(f"Durée de remboursement estimée : {optimal_period} mois (environ {optimal_period // 12} ans et {optimal_period % 12} mois).")
+else:
+    print("Aucune option de crédit n'a été saisie.")
