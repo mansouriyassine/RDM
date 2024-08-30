@@ -32,11 +32,3 @@ def display_results(house_price, interest_rate):
         print(f"{'Pourcentage':<15}{'Montant':<15}{'Nouvelle mensualité':<20}{'Économie mensuelle':<20}")
         for repayment in partial_repayments:
             print(f"{repayment['percent']}%{repayment['repayment_amount']:.2f} MAD{repayment['new_monthly_payment']:.2f} MAD{repayment['savings']:.2f} MAD")
-
-def main():
-    house_price = float(input("Entrez le prix de la maison (MAD) : "))
-    interest_rate = float(input("Entrez le taux d'intérêt (%) : "))
-    display_results(house_price, interest_rate)
-
-if __name__ == "__main__":
-    main()
