@@ -1,14 +1,14 @@
 import numpy as np
 
 def calculate_monthly_payment(principal, annual_rate, loan_term_years):
-    """Calculate the monthly mortgage payment."""
+    """Calculer le paiement hypothécaire mensuel."""
     monthly_rate = annual_rate / 12
     num_payments = loan_term_years * 12
     monthly_payment = principal * (monthly_rate * (1 + monthly_rate) ** num_payments) / ((1 + monthly_rate) ** num_payments - 1)
     return monthly_payment
 
 def simulate_repayment(principal, annual_rate, loan_term_years, monthly_income, monthly_expenses, savings_rate_annual):
-    """Simulate the repayment period with savings account interest and annual partial repayments."""
+    """Simuler la période de remboursement avec intérêt du compte d'épargne et rachats partiels annuels."""
     monthly_payment = calculate_monthly_payment(principal, annual_rate, loan_term_years)
     remaining_loan = principal
     months_passed = 0
@@ -19,33 +19,42 @@ def simulate_repayment(principal, annual_rate, loan_term_years, monthly_income, 
     optimal_repurchase_moments = []
 
     while remaining_loan > 0:
+        # Calculer le revenu net après paiement des mensualités et des charges
         net_income = monthly_income - monthly_payment - monthly_expenses
-        savings_balance += net_income  # Add net income to savings account
+        savings_balance += net_income  # Ajouter le revenu net au compte d'épargne
         
-        # Apply savings interest
+        # Appliquer les intérêts d'épargne
         savings_balance *= (1 + savings_rate_monthly)
 
-        # Increment the months passed and total months
+        # Incrémenter le nombre de mois écoulés et le total des mois
         months_passed += 1
         total_months += 1
 
-        # Check if it's time for a repurchase (once a year)
+        # Vérifier s'il est temps de faire un rachat (une fois par an)
         if months_passed % 12 == 0 and savings_balance > 0:
-            # Repurchase part of the loan
+            print(f"\nAvant le rachat à {months_passed} mois:")
+            print(f" - Solde restant du prêt : {remaining_loan:,.2f} MAD")
+            print(f" - Mensualité actuelle : {monthly_payment:,.2f} MAD")
+
+            # Rachat partiel annuel du prêt
             remaining_loan -= savings_balance
             optimal_repurchase_moments.append((months_passed, savings_balance, remaining_loan))
-            savings_balance = 0  # Reset savings after repurchase
+            savings_balance = 0  # Réinitialiser l'épargne après le rachat
             times_of_repurchase += 1
 
-            # Recalculate monthly payment based on new remaining loan balance
+            # Recalculer la mensualité sur la base du nouveau solde du prêt
             if remaining_loan > 0:
                 remaining_term_months = loan_term_years * 12 - months_passed
                 monthly_payment = calculate_monthly_payment(remaining_loan, annual_rate, remaining_term_months / 12)
+
+            print(f"Après le rachat à {months_passed} mois:")
+            print(f" - Nouveau solde restant du prêt : {remaining_loan:,.2f} MAD")
+            print(f" - Nouvelle mensualité : {monthly_payment:,.2f} MAD")
         
     return total_months, times_of_repurchase, optimal_repurchase_moments
 
 def find_optimal_loan_option(options, monthly_income, monthly_expenses, savings_rate_annual):
-    """Find the optimal loan option based on the shortest repayment period."""
+    """Trouver l'option de prêt optimale en fonction de la période de remboursement la plus courte."""
     optimal_option = None
     shortest_repayment_period = float('inf')
     optimal_repurchase_moments = []
@@ -63,7 +72,7 @@ def find_optimal_loan_option(options, monthly_income, monthly_expenses, savings_
     
     return optimal_option, shortest_repayment_period, optimal_repurchase_moments
 
-# Collecting user inputs
+# Collecte des entrées utilisateur
 loan_options = []
 
 print("Entrez les options de crédit. Entrez 'stop' pour terminer la saisie.")
