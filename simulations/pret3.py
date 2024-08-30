@@ -8,7 +8,7 @@ def calculate_monthly_payment(principal, annual_rate, loan_term_years):
     return monthly_payment
 
 def simulate_repayment(principal, annual_rate, loan_term_years, monthly_income, monthly_expenses, savings_rate_annual):
-    """Simulate the repayment period with savings account interest and partial repayments."""
+    """Simulate the repayment period with savings account interest and annual partial repayments."""
     monthly_payment = calculate_monthly_payment(principal, annual_rate, loan_term_years)
     remaining_loan = principal
     months_passed = 0
@@ -29,9 +29,8 @@ def simulate_repayment(principal, annual_rate, loan_term_years, monthly_income, 
         months_passed += 1
         total_months += 1
 
-        # Check if savings are enough for a partial repurchase (e.g., threshold of 10,000 MAD)
-        repurchase_threshold = 10000
-        if savings_balance >= repurchase_threshold:
+        # Check if it's time for a repurchase (once a year)
+        if months_passed % 12 == 0 and savings_balance > 0:
             # Repurchase part of the loan
             remaining_loan -= savings_balance
             optimal_repurchase_moments.append((months_passed, savings_balance, remaining_loan))
@@ -92,7 +91,7 @@ if loan_options:
     print(f"\nLa meilleure option de crédit est: Principal: {optimal_option[0]:,.2f} MAD, Taux d'intérêt annuel: {optimal_option[1] * 100:.2f}%, Durée: {optimal_option[2]} ans.")
     print(f"Durée de remboursement estimée : {optimal_period} mois (environ {optimal_period // 12} ans et {optimal_period % 12} mois).")
     
-    print("\nMoments optimaux pour les rachats partiels :")
+    print("\nMoments optimaux pour les rachats partiels (annuels) :")
     for moment in optimal_repurchase_moments:
         print(f" - Après {moment[0]} mois : Rachat de {moment[1]:,.2f} MAD, Nouveau solde restant du prêt : {moment[2]:,.2f} MAD")
 
