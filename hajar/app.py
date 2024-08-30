@@ -13,7 +13,7 @@ def surprise():
     phrases = [
         "hajjoura",
         "9ahbouna",
-        "boha 3anda tabbouna",
+        "bo7da 3anda tabbouna",
         "za3kouna",
         "bangola",
         "mangola"
